@@ -25,6 +25,7 @@ class FanAccessory {
     callback(null, this.config.name)
   }
 
+  // TODO
   getOn (callback) {
     this.log('getOn')
     callback(null, 0)
@@ -36,6 +37,7 @@ class FanAccessory {
     callback(null)
   }
 
+  // TODO
   getRotationSpeed (callback) {
     this.log('getRotationSpeed')
     callback(null, 0)
