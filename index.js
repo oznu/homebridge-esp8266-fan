@@ -16,35 +16,39 @@ class FanAccessory {
     this.config = config
     this.service = new Service.Fan(this.config.name)
 
+    this.status = {
+      power: false,
+      speed: 0
+    }
+
     this.fan = new ESP8266Fan(this.config)
     this.fan.on('websocket-status', this.log)
+
+    this.fan.on('fan-status', (status) => {
+      this.status.power = status.power
+      this.status.speed = status.speed
+    })
   }
 
   getName (callback) {
-    this.log('getName')
     callback(null, this.config.name)
   }
 
-  // TODO
   getOn (callback) {
-    this.log('getOn')
-    callback(null, 0)
+    callback(null, this.status.power)
   }
 
   setOn (value, callback) {
-    this.log(`setOn - ${value}`)
+    this.log(`Setting fan power state - ${value}`)
     this.fan.send({power: value})
     callback(null)
   }
 
-  // TODO
   getRotationSpeed (callback) {
-    this.log('getRotationSpeed')
-    callback(null, 0)
+    callback(null, this.status.speed)
   }
 
   setRotationSpeed (value, callback) {
-    this.log(`setRotationSpeed - ${value}`)
     this.fan.send({speed: value})
     callback(null)
   }

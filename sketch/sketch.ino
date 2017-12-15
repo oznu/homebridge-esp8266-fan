@@ -30,13 +30,13 @@ String currentState = "off";
 int currentSpeed = 0;
 
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length) {
-  Serial.printf("webSocketEvent(%d, %d, ...)\r\n", num, type);
   switch(type) {
     case WStype_DISCONNECTED:
       Serial.printf("[%u] Disconnected!\r\n", num);
       break;
     case WStype_CONNECTED:
       Serial.printf("[%u] Connected from url: %s\r\n", num, payload);
+      sendUpdate();
       break;
     case WStype_TEXT: {
       Serial.printf("[%u] get Text: %s\r\n", num, payload);
@@ -49,6 +49,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
       }
 
       if (root.containsKey("speed")) {
+        currentSpeed = root["speed"];
         adjustSpeed(root["speed"]);
       }
 
@@ -63,13 +64,36 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
   }
 }
 
+void sendUpdate() {
+  DynamicJsonBuffer jsonBuffer;
+  JsonObject& root = jsonBuffer.createObject();
+
+  root["speed"] = currentSpeed;
+
+  if (digitalRead(POWER_PIN) == STATE_ON) {
+    root["power"] = true;
+  } else {
+    root["power"] = false;
+  }
+
+  String res;
+  root.printTo(res);
+
+  webSocket.broadcastTXT(res);
+}
+
 void togglePower(bool value) {
   if (value) {
     digitalWrite(POWER_PIN, STATE_ON);
+    if (currentSpeed == 0) {
+      adjustSpeed(25);
+    }
   } else {
     digitalWrite(POWER_PIN, STATE_OFF);
     setSpeedSetting("off");
   }
+
+  sendUpdate();
 }
 
 
@@ -91,26 +115,23 @@ void setSpeedSetting(String setting) {
       digitalWrite(SPEED_MED_PIN, STATE_ON);
     } else if (setting == "max") {
       digitalWrite(SPEED_MAX_PIN, STATE_ON);
-    } else {
-      togglePower(false);
     }
   }
+
+  sendUpdate();
 }
 
 void adjustSpeed(int value) {
   if (value < 1) {
     // off
-    setSpeedSetting("off");
-    currentSpeed = 0;
+    togglePower(false);
     Serial.printf("Speed set to %d. Turning off\n", value);
   } else if (value < 34) {
     // set low
-    currentSpeed = value;
     setSpeedSetting("low");
     Serial.printf("Speed set to %d. Setting to low\n", value);
   } else if (value < 67) {
     // set medium
-    currentSpeed = value;
     setSpeedSetting("med");
     Serial.printf("Speed set to %d. Setting to medium\n", value);
   } else if (value < 101) {
@@ -119,8 +140,7 @@ void adjustSpeed(int value) {
     Serial.printf("Speed set to %d. Setting to high\n", value);
   } else {
     // invalid value - turn off
-    currentSpeed = 0;
-    setSpeedSetting("off");
+    togglePower(false);
     Serial.printf("Speed set to %d. Invalid Speed. Turning off.\n", value);
   }
 }
