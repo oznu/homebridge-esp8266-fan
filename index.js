@@ -28,6 +28,10 @@ class FanAccessory {
       this.status.power = status.power
       this.status.speed = status.speed
     })
+
+    this.fan.on('error', (error) => {
+      this.log(error)
+    })
   }
 
   getName (callback) {
@@ -39,8 +43,10 @@ class FanAccessory {
   }
 
   setOn (value, callback) {
-    this.log(`Setting fan power state - ${value}`)
-    this.fan.send({power: value})
+    if (this.status.power !== value) {
+      this.log(`Setting fan power state - ${value ? 'ON' : 'OFF'}`)
+      this.fan.send({power: value, speed: this.status.speed || 25})
+    }
     callback(null)
   }
 
