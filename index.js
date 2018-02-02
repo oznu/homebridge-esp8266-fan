@@ -1,6 +1,6 @@
 'use strict'
 
-const ESP8266Fan = require('./lib/fan')
+const WebSocket = require('@oznu/ws-connect')
 
 var Service, Characteristic
 
@@ -21,12 +21,22 @@ class FanAccessory {
       speed: 0
     }
 
-    this.fan = new ESP8266Fan(this.config)
+    this.fan = new WebSocket(`ws://${this.config.host}:${this.config.port}`, {
+      options: {
+        handshakeTimeout: 2000
+      }
+    })
     this.fan.on('websocket-status', this.log)
 
-    this.fan.on('fan-status', (status) => {
-      this.status.power = status.power
-      this.status.speed = status.speed
+    this.fan.on('json', (status) => {
+      if ('power' in status) {
+        this.status.power = status.power
+        this.service.getCharacteristic(Characteristic.On).updateValue(status.power)
+      }
+      if ('speed' in status) {
+        this.status.speed = status.speed
+        this.service.getCharacteristic(Characteristic.RotationSpeed).updateValue(status.speed)
+      }
     })
 
     this.fan.on('error', (error) => {
@@ -34,33 +44,8 @@ class FanAccessory {
     })
   }
 
-  getName (callback) {
-    callback(null, this.config.name)
-  }
-
-  getOn (callback) {
-    callback(null, this.status.power)
-  }
-
-  setOn (value, callback) {
-    if (this.status.power !== value) {
-      this.log(`Setting fan power state - ${value ? 'ON' : 'OFF'}`)
-      this.fan.send({power: value, speed: this.status.speed || 25})
-    }
-    callback(null)
-  }
-
-  getRotationSpeed (callback) {
-    callback(null, this.status.speed)
-  }
-
-  setRotationSpeed (value, callback) {
-    this.fan.send({speed: value})
-    callback(null)
-  }
-
   getServices () {
-    var informationService = new Service.AccessoryInformation()
+    const informationService = new Service.AccessoryInformation()
       .setCharacteristic(Characteristic.Manufacturer, 'oznu')
       .setCharacteristic(Characteristic.Model, 'esp8266-fan')
       .setCharacteristic(Characteristic.SerialNumber, 'oznu-esp8266-fan')
@@ -81,4 +66,30 @@ class FanAccessory {
 
     return [informationService, this.service]
   }
+
+  getName (callback) {
+    callback(null, this.config.name)
+  }
+
+  getOn (callback) {
+    callback(null, this.status.power)
+  }
+
+  setOn (value, callback) {
+    if (this.status.power !== value) {
+      this.log(`Setting fan power state - ${value ? 'ON' : 'OFF'}`)
+      this.fan.sendJson({power: value, speed: this.status.speed || 25})
+    }
+    callback(null)
+  }
+
+  getRotationSpeed (callback) {
+    callback(null, this.status.speed)
+  }
+
+  setRotationSpeed (value, callback) {
+    this.fan.sendJson({speed: value})
+    callback(null)
+  }
+
 }

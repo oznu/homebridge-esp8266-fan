@@ -9,9 +9,10 @@
     "homebridge-plugin"
   ],
   "engines": {
-    "homebridge": ">=0.2.5"
+    "homebridge": ">=0.2.5",
+    "node": ">=6.9.1"
   },
   "dependencies": {
-    "ws": "^3.3.2"
+    "@oznu/ws-connect": "^0.0.3"
   }
 }
