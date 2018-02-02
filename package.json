@@ -13,6 +13,6 @@
     "node": ">=6.9.1"
   },
   "dependencies": {
-    "@oznu/ws-connect": "^0.0.3"
+    "@oznu/ws-connect": "0.0.4"
   }
 }
