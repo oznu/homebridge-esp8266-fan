@@ -1,10 +1,14 @@
 {
   "name": "homebridge-esp8266-fan",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A Homebridge plugin to control an esp8266 managed fan.",
   "main": "index.js",
   "author": "oznu <dev@oz.nu>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/oznu/homebridge-esp8266-fan.git"
+  },
   "keywords": [
     "homebridge-plugin"
   ],
