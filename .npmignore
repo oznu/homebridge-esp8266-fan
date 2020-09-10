@@ -1,5 +1,10 @@
 # Don't publish these folders to npm
 sketch
+src
+.arduino-output
+sketch
+.github
+.vscode
 
 # Logs
 logs

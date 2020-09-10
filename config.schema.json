@@ -1,6 +1,7 @@
 {
-  "pluginAlias": "ESP8266 Fan",
-  "pluginType": "accessory",
+  "pluginAlias": "Esp8266Fan",
+  "pluginType": "platform",
+  "singular": true,
   "footerDisplay": "This plugin works with an Arduino sketch which is available [here](https://github.com/oznu/homebridge-esp8266-fan/blob/master/sketch/sketch.ino).",
   "schema": {
     "type": "object",
@@ -9,19 +10,6 @@
         "title": "Name",
         "type": "string",
         "default": "Fan",
-        "required": true
-      },
-      "host": {
-        "title": "IP Address / Hostname",
-        "type": "string",
-        "required": true,
-        "format": "hostname"
-      },
-      "port": {
-        "title": "Port",
-        "type": "integer",
-        "default": 81,
-        "maximum": 65535,
         "required": true
       }
     }

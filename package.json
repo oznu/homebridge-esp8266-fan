@@ -1,22 +1,47 @@
 {
   "name": "homebridge-esp8266-fan",
-  "version": "0.1.2",
+  "version": "1.0.0",
   "description": "A Homebridge plugin to control an esp8266 managed fan.",
-  "main": "index.js",
+  "main": "dist/index.js",
   "author": "oznu <dev@oz.nu>",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git://github.com/oznu/homebridge-esp8266-fan.git"
   },
+  "bugs": {
+    "url": "https://github.com/oznu/homebridge-esp8266-fan/issues"
+  },
+  "scripts": {
+    "lint": "eslint src/**.ts",
+    "watch": "npm run build && npm link && nodemon",
+    "build": "rimraf ./dist && tsc",
+    "prepublishOnly": "npm run lint && npm run build"
+  },
   "keywords": [
-    "homebridge-plugin"
+    "homebridge-plugin",
+    "esp8266",
+    "esp",
+    "fan"
   ],
   "engines": {
-    "homebridge": ">=0.2.5",
-    "node": ">=6.9.1"
+    "node": ">=10.17.0",
+    "homebridge": ">=1.0.0"
   },
   "dependencies": {
-    "@oznu/ws-connect": "0.0.4"
+    "@oznu/ws-connect": "^2.2.0",
+    "bonjour": "^3.5.0",
+    "mdns-resolver": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^14.6.4",
+    "@typescript-eslint/eslint-plugin": "^4.1.0",
+    "@typescript-eslint/parser": "^4.1.0",
+    "eslint": "^7.8.1",
+    "homebridge": "^1.1.6",
+    "nodemon": "^2.0.4",
+    "rimraf": "^3.0.2",
+    "ts-node": "^9.0.0",
+    "typescript": "^4.0.2"
   }
 }

@@ -1,0 +1,2 @@
+#define AUTH_USERNAME          "username"
+#define AUTH_PASSWORD          "password"
